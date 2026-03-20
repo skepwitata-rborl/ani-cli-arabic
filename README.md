@@ -1,5 +1,10 @@
 <div align="center">
 
+> [!WARNING]
+> This is a caution message. Be careful when using this package.
+> This branch contains the latest unstable development changes. Features may break. Only use this if you want to test new features.
+> For the stable version, please switch to the `main` branch or use the latest release.
+
 ## 📑 Navigation
 
 [Installation](#-installation) • [Features](#-what-can-you-do) • [How to Use](#-how-to-use) • [Keyboard Shortcuts](#️-keyboard-shortcuts) • [Configuration](#%EF%B8%8F-configuration) • [Contributors](#-contributors) • [License](#-license)
