@@ -58,8 +58,10 @@ def test_get_episodes_sorted(mock_get, provider):
     anime = Anime(title="ناروتو", url="https://animeiat.tv/anime/naruto", provider="animeiat")
     episodes = provider.get_episodes(anime)
     assert len(episodes) == 2
+    # Episodes should be sorted in ascending order by number
     assert episodes[0].number == 1
     assert episodes[1].number == 2
+    assert episodes[0].number < episodes[1].number
 
 
 @patch("ani_cli_arabic.providers.animeiat.requests.get")
