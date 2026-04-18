@@ -1,36 +1,38 @@
-from typing import Dict, List, Type
+from __future__ import annotations
+
+from typing import Dict, Type
 
 from .base import BaseProvider
 
-_REGISTRY: Dict[str, Type[BaseProvider]] = {}
+_registry: Dict[str, Type[BaseProvider]] = {}
+_bootstrapped = False
 
 
 def _bootstrap() -> None:
+    global _bootstrapped
+    if _bootstrapped:
+        return
     from .animeiat import AnimeiatProvider
     from .animekisa import AnimekisaProvider
     from .animerco import AnimercoProvider
+    from .shahed4u import Shahed4uProvider
 
-    register_provider("animeiat", AnimeiatProvider)
-    register_provider("animekisa", AnimekisaProvider)
-    register_provider("animerco", AnimercoProvider)
+    for cls in (AnimeiatProvider, AnimekisaProvider, AnimercoProvider, Shahed4uProvider):
+        _registry[cls.name] = cls
+    _bootstrapped = True
 
 
-def register_provider(name: str, cls: Type[BaseProvider]) -> None:
-    """Register a provider class under the given name."""
-    _REGISTRY[name] = cls
+def register_provider(cls: Type[BaseProvider]) -> None:
+    _registry[cls.name] = cls
 
 
 def get_provider(name: str) -> BaseProvider:
-    """Return an instantiated provider by name."""
-    if not _REGISTRY:
-        _bootstrap()
-    if name not in _REGISTRY:
-        raise KeyError(f"Unknown provider: '{name}'. Available: {list(_REGISTRY.keys())}")
-    return _REGISTRY[name]()
+    _bootstrap()
+    if name not in _registry:
+        raise KeyError(f"Unknown provider: {name!r}. Available: {list(_registry)}")
+    return _registry[name]()
 
 
-def list_providers() -> List[str]:
-    """Return list of registered provider names."""
-    if not _REGISTRY:
-        _bootstrap()
-    return list(_REGISTRY.keys())
+def list_providers() -> list[str]:
+    _bootstrap()
+    return list(_registry.keys())

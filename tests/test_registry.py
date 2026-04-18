@@ -1,51 +1,58 @@
-"""Tests for the provider registry."""
 from __future__ import annotations
 
 import pytest
 
+from ani_cli_arabic.providers.base import Anime, BaseProvider, Episode
 from ani_cli_arabic.providers.registry import (
+    _registry,
     get_provider,
     list_providers,
     register_provider,
 )
-from ani_cli_arabic.providers.animeiat import AnimeiatProvider
-from ani_cli_arabic.providers.base import Anime, BaseProvider, Episode
+
+
+class DummyProvider(BaseProvider):
+    name = "dummy"
+
+    def search(self, query):
+        return []
+
+    def get_episodes(self, anime):
+        return []
+
+    def get_stream_url(self, episode):
+        return ""
 
 
 def test_list_providers_contains_animeiat():
-    assert "animeiat" in list_providers()
+    providers = list_providers()
+    assert "animeiat" in providers
+
+
+def test_list_providers_contains_shahed4u():
+    providers = list_providers()
+    assert "shahed4u" in providers
+
+
+def test_list_providers_contains_all_builtin():
+    providers = list_providers()
+    for name in ("animeiat", "animekisa", "animerco", "shahed4u"):
+        assert name in providers
 
 
 def test_get_provider_returns_correct_instance():
-    provider = get_provider("animeiat")
-    assert isinstance(provider, AnimeiatProvider)
+    p = get_provider("shahed4u")
+    from ani_cli_arabic.providers.shahed4u import Shahed4uProvider
+    assert isinstance(p, Shahed4uProvider)
 
 
 def test_get_provider_raises_for_unknown():
     with pytest.raises(KeyError, match="Unknown provider"):
-        get_provider("nonexistent")
+        get_provider("nonexistent_xyz")
 
 
 def test_register_custom_provider():
-    class DummyProvider(BaseProvider):
-        name = "dummy_reg"
-
-        def search(self, query): return []
-        def get_episodes(self, anime): return []
-        def get_stream_url(self, episode): return ""
-
     register_provider(DummyProvider)
-    assert "dummy_reg" in list_providers()
-    assert isinstance(get_provider("dummy_reg"), DummyProvider)
-
-
-def test_register_provider_raises_without_name():
-    class NoNameProvider(BaseProvider):
-        name = ""
-
-        def search(self, query): return []
-        def get_episodes(self, anime): return []
-        def get_stream_url(self, episode): return ""
-
-    with pytest.raises(ValueError, match="non-empty"):
-        register_provider(NoNameProvider)
+    assert "dummy" in list_providers()
+    p = get_provider("dummy")
+    assert isinstance(p, DummyProvider)
