@@ -63,6 +63,7 @@ def test_get_episodes_sorted(mock_get, provider):
     anime = Anime(title="Naruto", url="https://shahed4u.art/anime/naruto", image="", provider="shahed4u")
     episodes = provider.get_episodes(anime)
     assert len(episodes) == 2
+    # Episodes should be sorted ascending so ep 1 comes before ep 2
     assert episodes[0].number == 1
     assert episodes[1].number == 2
 
@@ -81,5 +82,6 @@ def test_get_stream_url_raises_when_no_iframe(mock_get, provider):
     mock_get.return_value = _mock_response("<html></html>")
     anime = Anime(title="Naruto", url="", image="", provider="shahed4u")
     ep = Episode(number=1, url="https://shahed4u.art/ep/1", anime=anime)
+    # Expecting ValueError when no iframe/stream source is found in the page
     with pytest.raises(ValueError):
         provider.get_stream_url(ep)
