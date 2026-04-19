@@ -37,6 +37,14 @@ STREAM_HTML = """
 </body></html>
 """
 
+# HTML with multiple iframes - only the first should be used as the stream URL
+MULTIPLE_IFRAMES_HTML = """
+<html><body>
+  <iframe src="https://streamserver.example.com/embed/abc123"></iframe>
+  <iframe src="https://ads.example.com/banner"></iframe>
+</body></html>
+"""
+
 
 def _mock_response(html: str) -> MagicMock:
     mock = MagicMock()
@@ -66,6 +74,14 @@ def test_get_episodes_sorted(provider):
 def test_get_stream_url_from_iframe(provider):
     episode = Episode(number=1, title="Episode 1", url="https://animekisa.tv/watch/naruto-1234/episode-1")
     with patch("requests.get", return_value=_mock_response(STREAM_HTML)):
+        url = provider.get_stream_url(episode)
+    assert url == "https://streamserver.example.com/embed/abc123"
+
+
+def test_get_stream_url_returns_first_iframe_when_multiple(provider):
+    # Ensure only the first iframe src is returned, not subsequent ones (e.g. ads)
+    episode = Episode(number=1, title="Episode 1", url="https://animekisa.tv/watch/naruto-1234/episode-1")
+    with patch("requests.get", return_value=_mock_response(MULTIPLE_IFRAMES_HTML)):
         url = provider.get_stream_url(episode)
     assert url == "https://streamserver.example.com/embed/abc123"
 
