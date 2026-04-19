@@ -62,3 +62,10 @@ def test_register_custom_provider():
 def test_list_providers_returns_list():
     providers = list_providers()
     assert isinstance(providers, list)
+
+
+# Personal note: also useful to confirm the list is sorted alphabetically,
+# makes it easier to scan when printing provider names in the CLI
+def test_list_providers_is_sorted():
+    providers = list_providers()
+    assert providers == sorted(providers)
