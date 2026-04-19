@@ -21,8 +21,8 @@ class Anime:
     cover_url: Optional[str] = None
     episodes: List[Episode] = field(default_factory=list)
     total_episodes: int = 0
-    # Using 'ongoing' as default since most anime I browse are airing
-    status: str = "ongoing"
+    # Defaulting to 'unknown' since status isn't always available when scraping
+    status: str = "unknown"
 
 
 class BaseProvider(ABC):
