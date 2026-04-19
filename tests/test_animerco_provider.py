@@ -50,6 +50,7 @@ def test_get_episodes_sorted(provider):
     anime = Anime(title="Naruto", url="https://animerco.org/anime/naruto")
     with patch("requests.get", return_value=_mock_response(html)):
         episodes = provider.get_episodes(anime)
+    # Episodes should always come back in ascending order regardless of page order
     assert [e.number for e in episodes] == [1, 2, 3]
 
 
@@ -62,6 +63,7 @@ def test_get_stream_url_from_iframe(provider):
 
 
 def test_get_stream_url_raises_when_no_iframe(provider):
+    # This should raise ValueError, not return None or an empty string
     episode = Episode(title="Episode 1", url="https://animerco.org/ep/1", number=1)
     with patch("requests.get", return_value=_mock_response("<html></html>")):
         with pytest.raises(ValueError):
