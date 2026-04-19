@@ -40,6 +40,14 @@ EPISODES_HTML = """
 
 STREAM_HTML = '<div class="embed"><iframe src="https://stream.example.com/abc"></iframe></div>'
 
+# Multiple iframes sometimes appear on the page; we expect the first one to be used
+STREAM_HTML_MULTIPLE_IFRAMES = (
+    '<div class="embed">'
+    '<iframe src="https://stream.example.com/first"></iframe>'
+    '<iframe src="https://stream.example.com/second"></iframe>'
+    '</div>'
+)
+
 
 @patch("ani_cli_arabic.providers.shahed4u.requests.get")
 def test_search_returns_anime_list(mock_get, provider):
@@ -75,6 +83,16 @@ def test_get_stream_url_from_iframe(mock_get, provider):
     ep = Episode(number=1, url="https://shahed4u.art/ep/1", anime=anime)
     url = provider.get_stream_url(ep)
     assert url == "https://stream.example.com/abc"
+
+
+@patch("ani_cli_arabic.providers.shahed4u.requests.get")
+def test_get_stream_url_uses_first_iframe_when_multiple(mock_get, provider):
+    """When the page has multiple iframes, the first src should be returned."""
+    mock_get.return_value = _mock_response(STREAM_HTML_MULTIPLE_IFRAMES)
+    anime = Anime(title="Naruto", url="", image="", provider="shahed4u")
+    ep = Episode(number=1, url="https://shahed4u.art/ep/1", anime=anime)
+    url = provider.get_stream_url(ep)
+    assert url == "https://stream.example.com/first"
 
 
 @patch("ani_cli_arabic.providers.shahed4u.requests.get")
