@@ -29,6 +29,13 @@ STREAM_HTML = """
 </body></html>
 """
 
+# HTML with no episodes, to test the empty list edge case
+EMPTY_EPISODES_HTML = """
+<html><body>
+  <div class="content">لا توجد حلقات</div>
+</body></html>
+"""
+
 
 @pytest.fixture
 def provider() -> AnimeiatProvider:
@@ -62,6 +69,15 @@ def test_get_episodes_sorted(mock_get, provider):
     assert episodes[0].number == 1
     assert episodes[1].number == 2
     assert episodes[0].number < episodes[1].number
+
+
+@patch("ani_cli_arabic.providers.animeiat.requests.get")
+def test_get_episodes_empty(mock_get, provider):
+    """Ensure an empty list is returned when no episode items are found."""
+    mock_get.return_value = _mock_response(EMPTY_EPISODES_HTML)
+    anime = Anime(title="ناروتو", url="https://animeiat.tv/anime/naruto", provider="animeiat")
+    episodes = provider.get_episodes(anime)
+    assert episodes == []
 
 
 @patch("ani_cli_arabic.providers.animeiat.requests.get")
