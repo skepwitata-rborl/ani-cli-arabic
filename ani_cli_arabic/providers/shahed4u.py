@@ -14,10 +14,12 @@ class Shahed4uProvider(BaseProvider):
 
     BASE_URL = "https://shahed4u.art"
     name = "shahed4u"
+    # Increased timeout from 10 to 20 seconds — site can be slow sometimes
+    DEFAULT_TIMEOUT = 20
 
     def search(self, query: str) -> List[Anime]:
         url = f"{self.BASE_URL}/?s={requests.utils.quote(query)}"
-        resp = requests.get(url, timeout=10)
+        resp = requests.get(url, timeout=self.DEFAULT_TIMEOUT)
         resp.raise_for_status()
         soup = BeautifulSoup(resp.text, "html.parser")
         results: List[Anime] = []
@@ -33,7 +35,7 @@ class Shahed4uProvider(BaseProvider):
         return results
 
     def get_episodes(self, anime: Anime) -> List[Episode]:
-        resp = requests.get(anime.url, timeout=10)
+        resp = requests.get(anime.url, timeout=self.DEFAULT_TIMEOUT)
         resp.raise_for_status()
         soup = BeautifulSoup(resp.text, "html.parser")
         episodes: List[Episode] = []
@@ -45,7 +47,7 @@ class Shahed4uProvider(BaseProvider):
         return sorted(episodes, key=lambda e: e.number)
 
     def get_stream_url(self, episode: Episode) -> str:
-        resp = requests.get(episode.url, timeout=10)
+        resp = requests.get(episode.url, timeout=self.DEFAULT_TIMEOUT)
         resp.raise_for_status()
         soup = BeautifulSoup(resp.text, "html.parser")
         iframe = soup.select_one("div.embed iframe, iframe[src]")
