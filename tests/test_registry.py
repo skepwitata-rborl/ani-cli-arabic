@@ -69,3 +69,12 @@ def test_list_providers_returns_list():
 def test_list_providers_is_sorted():
     providers = list_providers()
     assert providers == sorted(providers)
+
+
+# Personal note: added this to make sure registering the same provider twice
+# doesn't cause duplicates in the provider list — ran into this when testing
+def test_register_provider_no_duplicates():
+    register_provider(DummyProvider)
+    register_provider(DummyProvider)
+    providers = list_providers()
+    assert providers.count("dummy") == 1
