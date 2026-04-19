@@ -23,6 +23,8 @@ class Anime:
     total_episodes: int = 0
     # Defaulting to 'unknown' since status isn't always available when scraping
     status: str = "unknown"
+    # Language of the anime (e.g. 'ar' for Arabic dub, 'sub' for subtitled)
+    language: Optional[str] = None
 
 
 class BaseProvider(ABC):
@@ -30,6 +32,8 @@ class BaseProvider(ABC):
 
     name: str = "base"
     base_url: str = ""
+    # Default timeout in seconds for HTTP requests
+    request_timeout: int = 15
 
     @abstractmethod
     def search(self, query: str) -> List[Anime]:
