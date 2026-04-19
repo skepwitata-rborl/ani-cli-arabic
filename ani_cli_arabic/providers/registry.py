@@ -29,7 +29,11 @@ def register_provider(cls: Type[BaseProvider]) -> None:
 def get_provider(name: str) -> BaseProvider:
     _bootstrap()
     if name not in _registry:
-        raise KeyError(f"Unknown provider: {name!r}. Available: {list(_registry)}")
+        available = list(_registry)
+        raise KeyError(
+            f"Unknown provider: {name!r}. Available providers: {available}\n"
+            f"Tip: use list_providers() to see all registered providers."
+        )
     return _registry[name]()
 
 
