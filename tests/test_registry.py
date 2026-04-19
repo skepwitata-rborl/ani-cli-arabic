@@ -56,3 +56,9 @@ def test_register_custom_provider():
     assert "dummy" in list_providers()
     p = get_provider("dummy")
     assert isinstance(p, DummyProvider)
+
+
+# Personal note: verify that list_providers returns a list (not some other iterable)
+def test_list_providers_returns_list():
+    providers = list_providers()
+    assert isinstance(providers, list)
