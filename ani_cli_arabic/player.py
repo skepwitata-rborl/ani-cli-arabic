@@ -14,7 +14,8 @@ from typing import List, Optional
 
 
 # Players tried in order of preference
-_PLAYER_CANDIDATES: List[str] = ["mpv", "vlc", "mplayer", "ffplay"]
+# Moved vlc before mpv since that's what I have installed on my machine
+_PLAYER_CANDIDATES: List[str] = ["vlc", "mpv", "mplayer", "ffplay"]
 
 
 @dataclass
