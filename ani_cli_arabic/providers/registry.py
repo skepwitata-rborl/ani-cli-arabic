@@ -39,4 +39,5 @@ def get_provider(name: str) -> BaseProvider:
 
 def list_providers() -> list[str]:
     _bootstrap()
-    return list(_registry.keys())
+    # Return providers sorted alphabetically for consistent, predictable output
+    return sorted(_registry.keys())
