@@ -14,10 +14,12 @@ class AnimekisaProvider(BaseProvider):
 
     BASE_URL = "https://animekisa.tv"
     name = "animekisa"
+    # Increased timeout to reduce failures on slow connections
+    DEFAULT_TIMEOUT = 20
 
     def search(self, query: str) -> List[Anime]:
         url = f"{self.BASE_URL}/search"
-        response = requests.get(url, params={"q": query}, timeout=10)
+        response = requests.get(url, params={"q": query}, timeout=self.DEFAULT_TIMEOUT)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
         results: List[Anime] = []
@@ -33,7 +35,7 @@ class AnimekisaProvider(BaseProvider):
         return results
 
     def get_episodes(self, anime: Anime) -> List[Episode]:
-        response = requests.get(anime.url, timeout=10)
+        response = requests.get(anime.url, timeout=self.DEFAULT_TIMEOUT)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
         episodes: List[Episode] = []
@@ -51,7 +53,7 @@ class AnimekisaProvider(BaseProvider):
         return sorted(episodes, key=lambda e: e.number)
 
     def get_stream_url(self, episode: Episode) -> str:
-        response = requests.get(episode.url, timeout=10)
+        response = requests.get(episode.url, timeout=self.DEFAULT_TIMEOUT)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
         iframe = soup.select_one("iframe[src]")
