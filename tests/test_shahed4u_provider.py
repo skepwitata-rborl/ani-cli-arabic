@@ -48,6 +48,9 @@ STREAM_HTML_MULTIPLE_IFRAMES = (
     '</div>'
 )
 
+# HTML with no iframe at all, to verify graceful handling of missing stream
+STREAM_HTML_NO_IFRAME = '<div class="embed"></div>'
+
 
 @patch("ani_cli_arabic.providers.shahed4u.requests.get")
 def test_search_returns_anime_list(mock_get, provider):
@@ -96,10 +99,10 @@ def test_get_stream_url_uses_first_iframe_when_multiple(mock_get, provider):
 
 
 @patch("ani_cli_arabic.providers.shahed4u.requests.get")
-def test_get_stream_url_raises_when_no_iframe(mock_get, provider):
-    mock_get.return_value = _mock_response("<html></html>")
+def test_get_stream_url_returns_none_when_no_iframe(mock_get, provider):
+    """If the episode page has no iframe, get_stream_url should return None gracefully."""
+    mock_get.return_value = _mock_response(STREAM_HTML_NO_IFRAME)
     anime = Anime(title="Naruto", url="", image="", provider="shahed4u")
     ep = Episode(number=1, url="https://shahed4u.art/ep/1", anime=anime)
-    # Expecting ValueError when no iframe/stream source is found in the page
-    with pytest.raises(ValueError):
-        provider.get_stream_url(ep)
+    url = provider.get_stream_url(ep)
+    assert url is None
