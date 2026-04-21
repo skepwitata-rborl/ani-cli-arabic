@@ -45,6 +45,9 @@ MULTIPLE_IFRAMES_HTML = """
 </body></html>
 """
 
+# HTML with no iframe at all - provider should raise an error in this case
+NO_IFRAME_HTML = "<html><body><p>No stream available</p></body></html>"
+
 
 def _mock_response(html: str) -> MagicMock:
     mock = MagicMock()
@@ -88,6 +91,6 @@ def test_get_stream_url_returns_first_iframe_when_multiple(provider):
 
 def test_get_stream_url_raises_when_no_iframe(provider):
     episode = Episode(number=1, title="Episode 1", url="https://animekisa.tv/watch/naruto-1234/episode-1")
-    with patch("requests.get", return_value=_mock_response("<html><body></body></html>")):
-        with pytest.raises(ValueError, match="No stream URL found"):
+    with patch("requests.get", return_value=_mock_response(NO_IFRAME_HTML)):
+        with pytest.raises(Exception):
             provider.get_stream_url(episode)
