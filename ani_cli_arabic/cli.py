@@ -36,7 +36,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--play",
         action="store_true",
-        help="Automatically open the stream URL with mpv",
+        default=True,  # I always want auto-play; set False if you just want the URL printed
+        help="Automatically open the stream URL with mpv (default: True)",
     )
     return parser
 
@@ -109,9 +110,3 @@ def main(argv: list[str] | None = None) -> None:
     if args.play:
         print("\nLaunching mpv …")
         subprocess.run(["mpv", url], check=False)
-    else:
-        print("\nOpen the URL above in mpv, vlc, or your preferred player.")
-
-
-if __name__ == "__main__":
-    main()
