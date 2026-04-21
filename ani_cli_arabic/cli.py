@@ -2,6 +2,7 @@
 
 import sys
 import argparse
+import subprocess
 
 from ani_cli_arabic.providers.registry import get_provider, list_providers
 
@@ -30,6 +31,12 @@ def build_parser() -> argparse.ArgumentParser:
         "--list-providers",
         action="store_true",
         help="List available providers and exit",
+    )
+    # Personal addition: auto-play the stream URL with mpv instead of just printing it
+    parser.add_argument(
+        "--play",
+        action="store_true",
+        help="Automatically open the stream URL with mpv",
     )
     return parser
 
@@ -98,7 +105,12 @@ def main(argv: list[str] | None = None) -> None:
         sys.exit(1)
 
     print(f"\nStream URL:\n  {url}")
-    print("\nOpen the URL above in mpv, vlc, or your preferred player.")
+
+    if args.play:
+        print("\nLaunching mpv …")
+        subprocess.run(["mpv", url], check=False)
+    else:
+        print("\nOpen the URL above in mpv, vlc, or your preferred player.")
 
 
 if __name__ == "__main__":
