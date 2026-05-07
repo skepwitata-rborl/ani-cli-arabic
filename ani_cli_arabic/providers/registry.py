@@ -1,32 +1,32 @@
-"""Provider registry – maps provider names to their classes."""
+"""Provider registry for ani-cli-arabic."""
 from __future__ import annotations
 
-from typing import Dict, List, Type
+from typing import Dict, List, Optional, Type
 
 from .base import BaseProvider
 
 _registry: Dict[str, Type[BaseProvider]] = {}
+_bootstrapped = False
 
 
 def _bootstrap() -> None:
-    """Register all built-in providers (called lazily)."""
-    from .animeiat import AnimeiatProvider  # noqa: F401
-    from .animekisa import AnimekisaProvider  # noqa: F401
-    from .animerco import AnimercoProvider  # noqa: F401
-    from .shahed4u import Shahed4uProvider  # noqa: F401
-    from .witanime import WitanimeProvider  # noqa: F401
+    """Import and register all built-in providers."""
+    from .animeiat import AnimeiatProvider
+    from .animekisa import AnimekisaProvider
+    from .animerco import AnimercoProvider
+    from .arabseed import ArabseedProvider
+    from .shahed4u import Shahed4uProvider
+    from .witanime import WitanimeProvider
 
-    for cls in [
+    for cls in (
         AnimeiatProvider,
         AnimekisaProvider,
         AnimercoProvider,
+        ArabseedProvider,
         Shahed4uProvider,
         WitanimeProvider,
-    ]:
-        _registry[cls.name] = cls
-
-
-_bootstrapped = False
+    ):
+        register_provider(cls)
 
 
 def _ensure_bootstrapped() -> None:
@@ -37,21 +37,20 @@ def _ensure_bootstrapped() -> None:
 
 
 def register_provider(cls: Type[BaseProvider]) -> None:
-    """Register a custom provider class."""
+    """Register a provider class by its *name* attribute."""
+    if not hasattr(cls, "name") or not cls.name:
+        raise ValueError(f"Provider {cls!r} must define a non-empty 'name' attribute.")
     _registry[cls.name] = cls
 
 
-def get_provider(name: str) -> BaseProvider:
-    """Return an instance of the named provider."""
+def get_provider(name: str) -> Optional[BaseProvider]:
+    """Return an instantiated provider by name, or *None* if not found."""
     _ensure_bootstrapped()
-    try:
-        return _registry[name]()
-    except KeyError:
-        available = ", ".join(sorted(_registry))
-        raise KeyError(f"Unknown provider '{name}'. Available: {available}")
+    cls = _registry.get(name)
+    return cls() if cls is not None else None
 
 
 def list_providers() -> List[str]:
-    """Return sorted list of registered provider names."""
+    """Return a sorted list of all registered provider names."""
     _ensure_bootstrapped()
     return sorted(_registry.keys())
