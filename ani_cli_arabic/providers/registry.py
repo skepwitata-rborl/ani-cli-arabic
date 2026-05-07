@@ -10,11 +10,13 @@ _bootstrapped = False
 
 
 def _bootstrap() -> None:
-    """Import and register all built-in providers."""
+    """Lazily import and register all built-in providers."""
     from .animeiat import AnimeiatProvider
     from .animekisa import AnimekisaProvider
     from .animerco import AnimercoProvider
+    from .aniwatch import AniwatchProvider
     from .arabseed import ArabseedProvider
+    from .gogoanime import GogoanimeProvider
     from .shahed4u import Shahed4uProvider
     from .witanime import WitanimeProvider
 
@@ -22,11 +24,13 @@ def _bootstrap() -> None:
         AnimeiatProvider,
         AnimekisaProvider,
         AnimercoProvider,
+        AniwatchProvider,
         ArabseedProvider,
+        GogoanimeProvider,
         Shahed4uProvider,
         WitanimeProvider,
     ):
-        register_provider(cls)
+        _registry[cls.name] = cls
 
 
 def _ensure_bootstrapped() -> None:
@@ -36,11 +40,10 @@ def _ensure_bootstrapped() -> None:
         _bootstrapped = True
 
 
-def register_provider(cls: Type[BaseProvider]) -> None:
-    """Register a provider class by its *name* attribute."""
-    if not hasattr(cls, "name") or not cls.name:
-        raise ValueError(f"Provider {cls!r} must define a non-empty 'name' attribute.")
+def register_provider(cls: Type[BaseProvider]) -> Type[BaseProvider]:
+    """Register a provider class under its ``name`` attribute."""
     _registry[cls.name] = cls
+    return cls
 
 
 def get_provider(name: str) -> Optional[BaseProvider]:
@@ -51,6 +54,6 @@ def get_provider(name: str) -> Optional[BaseProvider]:
 
 
 def list_providers() -> List[str]:
-    """Return a sorted list of all registered provider names."""
+    """Return sorted list of all registered provider names."""
     _ensure_bootstrapped()
     return sorted(_registry.keys())
