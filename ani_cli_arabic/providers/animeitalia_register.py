@@ -1,5 +1,4 @@
-"""Register AnimeitaliaProvider in the global registry."""
-from .animeitalia import AnimeitaliaProvider
-from .registry import register_provider
+from ani_cli_arabic.providers.registry import register_provider
+from ani_cli_arabic.providers.animeitalia import AnimeitaliaProvider
 
-register_provider(AnimeitaliaProvider())
+register_provider("animeitalia", AnimeitaliaProvider)
